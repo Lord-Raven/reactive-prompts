@@ -82,6 +82,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         console.log(config);
 
         const fileContents = fs.readFileSync('chub_meta.yaml', 'utf8');
+        console.log(fileContents);
         const yamlData = yaml.load(fileContents) as Record<string, any>;
         console.log(yamlData);
 
