@@ -5,7 +5,34 @@
 project_name: "Reactive Prompts"
 
 # A short tagline to show in search.
-tagline: "A base template for all stages."
+tagline: "Generate reactive post-history instruction."
+
+creator_notes: "**What is this?**<br>
+  This is a utility stage that applies zero-shot categorization transformers to input and responses and dynamically includes post-history instructions.
+  <br>
+  <br>
+  Through the stage's configuration, you can update a JSON array of settings representing the tested concept, the associated prompt, and threshold value for inclusion. 
+  For each input or response, the stage will use apply a transformer to score the content against the array of concepts and then include prompt additions 
+  for concepts whose scores surpass the target threshold.
+  <br>
+  <br>
+  The default settings are geared toward directing the focus or length of the LLM's responses:<br>
+  * If the player provides an intimate or dialog interaction, the bot should likely reply with a relatively short response, to better empower a back-and-forth exchange.<br>
+  * If the player is looking at something, the bot should make an effort to describe that thing, even if it isn't the focus of the current scene.<br>
+  * If the player's message is invested in the moment, the bot should continue the current scene over moving on to something else.<br>
+  <br>
+  There is also the option to perform this analysis on the bot's responses. Currently, the only default is to push the bot to be more concise and grounded when 
+  the preceding response was too flowery.
+  <br>
+  <br>
+  You could use this feature to implement some custom behavior for your bots. For instance, if you want to reinforce that your bot distrusts the user and that will never change, 
+  you could add the concept \"friendly\" for the response with a prompt like, \"{{char}} reminds herself that she does not trust {{user}},\" and any time the bot becomes friendly, 
+  their next response should attempt to course correct. You could perhaps add something similar to the input side to prevent the bot from becoming friendly in the first place.
+  <br>
+  <br>
+  My sincerest apologies for the super ugly and unfriendly configuration format. The built-in configuration handling for stages is not super robust at the moment; 
+  I may move to a custom solution to avoid forcing people to deal with a single line of JSON.
+  "
 
 # 'PUBLIC', 'PRIVATE', or 'UNLISTED'.
 visibility: 'PRIVATE'
@@ -21,21 +48,59 @@ visibility: 'PRIVATE'
 position: 'NONE'
 
 # Self-explanatory.
-# tags:
-#  - 'Stage'
-#  - 'Admin'
-#  - 'Template'
-#  - 'Base'
+tags:
+ - 'Stage'
+ - 'Extension'
+ - 'Behavior'
+ - 'Utility'
 
 # The schema of any user-supplied config.
 # If your stage requires a configuration but has no
 #   defined schema, it won't work.
 config_schema:
+  title: Plodder Config
   type: object
   properties:
-    health:
-      type: integer
-      default: 100
+    inputConcepts:
+      title: Input Concept Prompts
+      description: A JSON array containing the prompts to be included when the input tests over the threshold for a given concept.
+      type: string
+      value: >
+        [{
+        "concept":"focused",
+        "threshold":0.8,
+        "prompt":"Invent or incorporate relevant or flavorful details surrounding the object of {{user}}'s attention."
+        },{
+        "concept":"intimate",
+        "threshold":0.8,
+        "prompt":"This is a tight moment; write only one or two sentences in your response."
+        },{
+        "concept":"action",
+        "threshold":0.8,
+        "prompt":"Directly address and describe the outcome or consequences of {{user}}'s actions."
+        },{
+        "concept":"open-ended",
+        "threshold":0.8,
+        "prompt":"This is an open-ended moment; write about two paragraphs in your response."
+        },{
+        "concept":"engaged",
+        "threshold":0.8,
+        "prompt":"{{user}} is engaged in the current scene; keep this moment going."
+        },{
+        "concept":"disengaged",
+        "threshold":0.5,
+        "prompt":"{{user}} is disengaging from the current scene; move events forward."
+        }]
+    responseConcepts:
+      title: Response Concept Prompts
+      description: A JSON array containing the prompts to be included when the response tests over the threshold for a given concept.
+      type: string
+      value: >
+        [{
+        "concept":"flowery",
+        "threshold": 0.8,
+        "prompt":"Keep your prose more grounded and concise."
+        }]
 
 # The schema of the state that you store.
 # This isn't needed even if you do store state,
