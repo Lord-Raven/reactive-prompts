@@ -22,38 +22,6 @@ type ConceptEntry = {
 
 export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateType, ConfigType> {
 
-    readonly INPUT_CONCEPTS: string = `[{` +
-        `"concept":"focused",` +
-        `"threshold":0.8,` +
-        `"prompt":"Invent or incorporate relevant or flavorful details surrounding the object of {{user}}'s attention."` +
-        `},{` +
-        `"concept":"narrow narrative potential",` +
-        `"threshold":0.6,` +
-        `"prompt":"This is a tight moment; write only two or three sentences in your response."` +
-        `},{` +
-        `"concept":"intense action",` +
-        `"threshold":0.7,` +
-        `"prompt":"Directly address and describe the outcome or consequences of {{user}}'s actions."` +
-        `},{` +
-        `"concept":"high narrative potential",` +
-        `"threshold":0.6,` +
-        `"prompt":"This is an open-ended moment; write about two paragraphs in your response."` +
-        `},{` +
-        `"concept":"engaged",` +
-        `"threshold":0.8,` +
-        `"prompt":"{{user}} is engaged in the current scene; keep this moment going."` +
-        `},{` +
-        `"concept":"disengaged",` +
-        `"threshold":0.6,` +
-        `"prompt":"{{user}} is disengaging from the current scene; move events forward."` +
-        `}]`;
-
-    readonly RESPONSE_CONCEPTS: string = `[{\n` +
-        `        "concept":"flowery",\n` +
-        `        "threshold": 0.8,\n` +
-        `        "prompt":"Keep your prose more grounded and concise."\n` +
-        `        }]`;
-
     // messageState
     lastInputWeights: {[key: string]: number};
     lastResponseWeights: {[key: string]: number};
@@ -68,6 +36,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
     responseConcepts: string[] = [];
     responseThresholds: {[key: string]: number} = {};
     responsePrompts: {[key: string]: string} = {};
+    config: any;
 
     constructor(data: InitialData<InitStateType, ChatStateType, MessageStateType, ConfigType>) {
         super(data);
@@ -80,18 +49,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         console.log('Config loaded:');
         console.log(config);
 
-        const inputConceptPrompts: ConceptEntry[] = JSON.parse((config ? config.inputConcepts : null) ?? this.INPUT_CONCEPTS);
-        const responseConceptPrompts: ConceptEntry[] = JSON.parse((config ? config.responseConcepts : null) ?? this.RESPONSE_CONCEPTS);
-        for (let entry of inputConceptPrompts) {
-            this.inputConcepts.push(entry.concept);
-            this.inputThresholds[entry.concept] = entry.threshold;
-            this.inputPrompts[entry.concept] = entry.prompt;
-        }
-        for (let entry of responseConceptPrompts) {
-            this.responseConcepts.push(entry.concept);
-            this.responseThresholds[entry.concept] = entry.threshold;
-            this.responsePrompts[entry.concept] = entry.prompt;
-        }
+        this.config = config;
 
         this.lastInputWeights = {};
         this.lastResponseWeights = {};
@@ -112,8 +70,23 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         }
 
         let yamlResponse = await fetch('chub_meta.yaml');
-        const data = yaml.load(await yamlResponse.text());
+        const data: any = yaml.load(await yamlResponse.text());
         console.log(data);
+
+        const inputConceptPrompts: ConceptEntry[] = JSON.parse((this.config ? this.config.inputConcepts : null) ?? data.config_schema.properties.inputConcepts.value);
+        const responseConceptPrompts: ConceptEntry[] = JSON.parse((this.config ? this.config.responseConcepts : null) ?? data.config_schema.properties.responseConcepts.value);
+        for (let entry of inputConceptPrompts) {
+            this.inputConcepts.push(entry.concept);
+            this.inputThresholds[entry.concept] = entry.threshold;
+            this.inputPrompts[entry.concept] = entry.prompt;
+        }
+        for (let entry of responseConceptPrompts) {
+            this.responseConcepts.push(entry.concept);
+            this.responseThresholds[entry.concept] = entry.threshold;
+            this.responsePrompts[entry.concept] = entry.prompt;
+        }
+
+
 
         return {
             success: true,
