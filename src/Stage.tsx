@@ -3,6 +3,8 @@ import {StageBase, StageResponse, InitialData, Message} from "@chub-ai/stages-ts
 import {LoadResponse} from "@chub-ai/stages-ts/dist/types/load";
 import {Character, User} from "@chub-ai/stages-ts";
 import {env, pipeline} from '@xenova/transformers';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 
 type MessageStateType = any;
 
@@ -17,6 +19,7 @@ type ConceptEntry = {
     threshold: number,
     prompt: string
 }
+
 
 export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateType, ConfigType> {
 
@@ -77,6 +80,10 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
         console.log('Config loaded:');
         console.log(config);
+
+        const fileContents = fs.readFileSync('chub_meta.yaml', 'utf8');
+        const yamlData = yaml.load(fileContents) as Record<string, any>;
+        console.log(yamlData);
 
         const inputConceptPrompts: ConceptEntry[] = JSON.parse((config ? config.inputConcepts : null) ?? this.INPUT_CONCEPTS);
         const responseConceptPrompts: ConceptEntry[] = JSON.parse((config ? config.responseConcepts : null) ?? this.RESPONSE_CONCEPTS);
