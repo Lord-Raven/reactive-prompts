@@ -67,25 +67,21 @@ config_schema:
       type: string
       value: >
         [{
-        "concept":"focused",
+        "concept":"inspecting",
         "threshold":0.8,
         "prompt":"Invent or incorporate relevant or flavorful details surrounding the object of {{user}}'s attention."
         },{
-        "concept":"intimate",
+        "concept":"intimate interaction",
         "threshold":0.8,
         "prompt":"This is a tight moment; target a smaller response size, writing only one or two paragraphs."
         },{
-        "concept":"action",
-        "threshold":0.8,
+        "concept":"intense action",
+        "threshold":0.7,
         "prompt":"Directly address and describe the outcome or consequences of {{user}}'s actions."
         },{
         "concept":"open-ended",
         "threshold":0.7,
         "prompt":"This is an open-ended moment; write more than usual in your response."
-        },{
-        "concept":"engaged",
-        "threshold":0.8,
-        "prompt":"{{user}} is engaged in the current scene; keep this moment going."
         },{
         "concept":"wrapping-up",
         "threshold":0.5,
