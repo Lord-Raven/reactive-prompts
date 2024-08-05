@@ -70,7 +70,6 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
         let yamlResponse = await fetch('chub_meta.yaml');
         const data: any = yaml.load(await yamlResponse.text());
-        console.log(data);
 
         const inputConceptPrompts: ConceptEntry[] = JSON.parse((this.config ? this.config.inputConcepts : null) ?? data.config_schema.properties.inputConcepts.value);
         const responseConceptPrompts: ConceptEntry[] = JSON.parse((this.config ? this.config.responseConcepts : null) ?? data.config_schema.properties.responseConcepts.value);
@@ -177,6 +176,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         } = botMessage;
 
         let pipelineResponse = await this.conceptPipeline(content, this.responsePrompts, { multi_label: true });
+        console.log(pipelineResponse);
         if (pipelineResponse && pipelineResponse.labels) {
             pipelineResponse.labels.forEach((value: string, index: number) => this.lastResponseWeights[value] = pipelineResponse.scores[index]);
         }
