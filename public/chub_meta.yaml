@@ -73,21 +73,21 @@ config_schema:
         },{
         "concept":"intimate",
         "threshold":0.8,
-        "prompt":"This is a tight moment; write only one or two sentences in your response."
+        "prompt":"This is a tight moment; target a smaller response size, writing only one or two paragraphs."
         },{
         "concept":"action",
         "threshold":0.8,
         "prompt":"Directly address and describe the outcome or consequences of {{user}}'s actions."
         },{
         "concept":"open-ended",
-        "threshold":0.8,
-        "prompt":"This is an open-ended moment; write about two paragraphs in your response."
+        "threshold":0.7,
+        "prompt":"This is an open-ended moment; write more than usual in your response."
         },{
         "concept":"engaged",
         "threshold":0.8,
         "prompt":"{{user}} is engaged in the current scene; keep this moment going."
         },{
-        "concept":"disengaged",
+        "concept":"wrapping-up",
         "threshold":0.5,
         "prompt":"{{user}} is disengaging from the current scene; move events forward."
         }]

@@ -48,7 +48,6 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
         console.log('Config loaded:');
         console.log(config);
-
         this.config = config;
 
         this.lastInputWeights = {};
@@ -85,8 +84,6 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
             this.responseThresholds[entry.concept] = entry.threshold;
             this.responsePrompts[entry.concept] = entry.prompt;
         }
-
-
 
         return {
             success: true,
@@ -131,7 +128,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         let pipelineResponse = await this.conceptPipeline(content, this.inputConcepts, { multi_label: true });
         console.log(pipelineResponse);
         if (pipelineResponse && pipelineResponse.labels) {
-            pipelineResponse.labels.forEach((value: string, index: number) => {console.log(value);this.lastInputWeights[value] = pipelineResponse.scores[index];});
+            pipelineResponse.labels.forEach((value: string, index: number) => this.lastInputWeights[value] = pipelineResponse.scores[index]);
         }
 
         let inputAdditions = Object.entries(this.lastInputWeights)
@@ -162,6 +159,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         }
 
         let stageDirections = `${inputAdditions}\n${responseAdditions}`;
+        console.log(`Including stage directions: ${stageDirections}`)
 
         return {
             stageDirections: stageDirections.trim().length > 0 ? `[INST]${stageDirections}[/INST]` : null,
@@ -180,7 +178,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
         let pipelineResponse = await this.conceptPipeline(content, this.responsePrompts, { multi_label: true });
         if (pipelineResponse && pipelineResponse.labels) {
-            pipelineResponse.labels.forEach((value: string, index: number) => {console.log(value);this.lastResponseWeights[value] = pipelineResponse.scores[index];});
+            pipelineResponse.labels.forEach((value: string, index: number) => this.lastResponseWeights[value] = pipelineResponse.scores[index]);
         }
 
         return {
@@ -201,7 +199,6 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
             display: 'grid',
             alignItems: 'stretch'
         }}>
-
         </div>;
     }
 
